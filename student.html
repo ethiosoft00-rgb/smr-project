@@ -2,17 +2,18 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SMR - Student</title>
 <link rel="stylesheet" href="css/style.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body class="dashboard-page">
 
-<button class="mobile-menu-btn" onclick="openMobileMenu()" aria-label="Menu">☰</button>
+<button class="mobile-menu-btn" onclick="openMobileMenu()" aria-label="Menu">&#9776;</button>
 <div class="topbar">
-  <h2>🎓 Student Dashboard</h2>
+  <h2>&#127891; Student Dashboard</h2>
   <div>
-    <span id="studentName" style="margin-right: 16px;"></span>
+    <span id="studentName" style="margin-right:16px;"></span>
     <button onclick="logout()">Logout</button>
   </div>
 </div>
@@ -25,16 +26,7 @@
     <button id="tab-ai" onclick="showTab('ai')">AI Tutor</button>
   </div>
 
-  <div id="view-overview" class="view"><div class="tab-banner banner-overview"><span>Welcome</span></div>
-
-    <div class="card">
-      <h3>Learning Environment</h3>
-      <div class="image-gallery">
-        <div class="image-tile tile-bahirdar"><span>My University</span></div>
-        <div class="image-tile tile-library"><span>Library</span></div>
-        <div class="image-tile tile-classroom"><span>Classroom</span></div>
-      </div>
-    </div>
+  <div id="view-overview" class="view">
     <div class="card">
       <h3>My Info</h3>
       <div class="stat">Name: <b id="infoName">-</b></div>
@@ -45,13 +37,11 @@
     </div>
   </div>
 
-  <div id="view-results" class="view" style="display:none"><div class="tab-banner banner-results"><span>My Results</span></div><div class="card"><h3>Featured — Study</h3><div class="image-gallery"><div class="image-tile tile-exam"><span>Exams</span></div><div class="image-tile tile-notebook"><span>Notes</span></div><div class="image-tile tile-reading"><span>Study Areas</span></div></div></div>
+  <div id="view-results" class="view" style="display:none">
     <div class="card">
       <h3>My Exam Results</h3>
       <table>
-        <thead>
-          <tr><th>Exam</th><th>Course</th><th>Score</th><th>Total</th><th>Action</th></tr>
-        </thead>
+        <thead><tr><th>Exam</th><th>Course</th><th>Score</th><th>Total</th><th>Status</th><th>Action</th></tr></thead>
         <tbody id="resultsTable"></tbody>
       </table>
     </div>
@@ -62,39 +52,25 @@
     </div>
   </div>
 
-  <div id="view-rank" class="view" style="display:none"><div class="tab-banner banner-rank"><span>My Rank</span></div><div class="card"><h3>Featured — Achievements</h3><div class="image-gallery"><div class="image-tile tile-trophy"><span>Trophy</span></div><div class="image-tile tile-graduation"><span>Graduation</span></div><div class="image-tile tile-chart"><span>Progress</span></div></div></div>
+  <div id="view-rank" class="view" style="display:none">
     <div class="card" style="border-left:4px solid #00b894;">
-      <h3>Overall Cumulative Rank (All Exams)</h3>
+      <h3>Overall Cumulative Rank</h3>
       <div id="cumulativeSummary"></div>
       <div id="cumulativeTable"></div>
     </div>
-
     <div class="card">
       <h3>My Rankings (Per Exam)</h3>
       <table>
-        <thead>
-          <tr>
-              <th>Exam</th>
-              <th>Your Score</th>
-              <th>Your %</th>
-              <th>Class Average</th>
-              <th>Avg %</th>
-              <th>Whole System Rank</th>
-              <th>Position</th>
-              <th>Same Grade</th>
-              <th>Same Grade + Field</th>
-            </tr>
-        </thead>
+        <thead><tr><th>Exam</th><th>Grade</th><th>Field</th><th>Same Class</th><th>Same Grade+Field</th><th>Same Grade</th><th>Whole System</th></tr></thead>
         <tbody id="rankTable"></tbody>
       </table>
     </div>
   </div>
 
-  <div id="view-ai" class="view" style="display:none"><div class="tab-banner banner-ai"><span>AI Tutor</span></div><div class="card"><h3>Featured — AI Tutor</h3><div class="image-gallery"><div class="image-tile tile-ai"><span>AI Tutor</span></div><div class="image-tile tile-students"><span>Classmates</span></div><div class="image-tile tile-science"><span>Subjects</span></div></div></div>
+  <div id="view-ai" class="view" style="display:none">
     <div class="card">
       <h3>AI Tutor</h3>
-      <p style="color:#666;font-size:13px;">Ask about your own results and progress.</p>
-      <input type="text" id="aiQuestion" placeholder="Ask a question..." />
+      <input type="text" id="aiQuestion" placeholder="Ask about your results..." />
       <button class="primary" onclick="askAI()">Ask</button>
       <div id="aiAnswer" style="margin-top:12px;white-space:pre-wrap;"></div>
     </div>
@@ -105,231 +81,38 @@
   </div>
 </div>
 
-<script src="js/supabase-client.js"></script>
-<script src="js/ai.js"></script>
-<script src="js/student.js"></script>
-
-<div class="mobile-menu-overlay" id="mobileMenuOverlay" onclick="closeMobileMenu(event)">
+<div class="mobile-menu-overlay" id="mobileMenuOverlay" onclick="closeMobileMenu()">
   <div class="mobile-menu-drawer" onclick="event.stopPropagation()">
     <div class="mobile-menu-header">
-      <span>SMR Menu</span>
-      <button onclick="closeMobileMenu()" aria-label="Close">×</button>
+      <span>&#128218; SMR Menu</span>
+      <button onclick="closeMobileMenu()">&times;</button>
     </div>
     <div class="mobile-menu-list" id="mobileMenuList"></div>
   </div>
 </div>
 <script>
 function openMobileMenu() {
-  var overlay = document.getElementById('mobileMenuOverlay');
   var list = document.getElementById('mobileMenuList');
-  var tabs = document.querySelectorAll('.tabbar button');
   list.innerHTML = '';
-  tabs.forEach(function (t) {
-    var btn = document.createElement('button');
-    btn.innerHTML = t.innerHTML;
-    btn.onclick = function () {
-      t.click();
-      closeMobileMenu();
-    };
-    if (t.classList.contains('active')) btn.className = 'active';
-    list.appendChild(btn);
+  document.querySelectorAll('.tabbar button').forEach(function (t) {
+    var b = document.createElement('button');
+    b.innerHTML = t.innerHTML;
+    b.onclick = function () { t.click(); closeMobileMenu(); };
+    if (t.classList.contains('active')) b.className = 'active';
+    list.appendChild(b);
   });
-  overlay.classList.add('open');
+  document.getElementById('mobileMenuOverlay').classList.add('open');
   document.body.style.overflow = 'hidden';
 }
-function closeMobileMenu(e) {
-  var overlay = document.getElementById('mobileMenuOverlay');
-  overlay.classList.remove('open');
+function closeMobileMenu() {
+  document.getElementById('mobileMenuOverlay').classList.remove('open');
   document.body.style.overflow = '';
 }
 </script>
 
+<script src="js/supabase-client.js"></script>
+<script src="js/ai.js"></script>
+<script src="js/student.js"></script>
+
 </body>
 </html>
-
-
-
-
-
-
-/* ===== PAGE BACKGROUNDS ===== */
-
-body.login-page {
-  background: linear-gradient(rgba(0, 30, 60, 0.78), rgba(0, 30, 60, 0.78)),
-              url('https://images.unsplash.com/photo-1564981797816-1043664bf78d?w=1920&q=80') center/cover no-repeat fixed;
-  background-color: #0a2540;
-  margin: 0;
-  padding: 0;
-}
-
-body.dashboard-page {
-  background: linear-gradient(rgba(240, 242, 245, 0.94), rgba(240, 242, 245, 0.94)),
-              url('https://images.unsplash.com/photo-1521587760476-6c12a4b040da?w=1920&q=80') center/cover no-repeat fixed;
-  background-attachment: fixed;
-}
-
-/* Login layout wrapper — scrolls if content is too tall */
-.login-wrapper {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 30px 20px;
-  box-sizing: border-box;
-}
-
-.login-wrapper .box {
-  background: rgba(255, 255, 255, 0.98);
-  backdrop-filter: blur(8px);
-  margin: 0;
-}
-
-.hero-title {
-  text-align: center;
-  margin-bottom: 24px;
-  max-width: 720px;
-}
-
-.hero-title h1 {
-  color: white;
-  font-size: 32px;
-  text-shadow: 2px 2px 10px rgba(0,0,0,0.7);
-  margin: 0 0 8px 0;
-  line-height: 1.2;
-}
-
-.hero-title p {
-  color: #cfe2ff;
-  font-size: 15px;
-  margin: 0 0 14px 0;
-  text-shadow: 1px 1px 4px rgba(0,0,0,0.6);
-  line-height: 1.4;
-}
-
-.hero-title .badge {
-  display: inline-block;
-  background: rgba(255,255,255,0.15);
-  color: white;
-  padding: 6px 16px;
-  border-radius: 20px;
-  font-size: 12px;
-  margin: 4px 4px 0 4px;
-  border: 1px solid rgba(255,255,255,0.3);
-  backdrop-filter: blur(4px);
-}
-
-.login-footer {
-  color: white;
-  font-size: 12px;
-  margin-top: 24px;
-  text-shadow: 1px 1px 4px rgba(0,0,0,0.6);
-  text-align: center;
-}
-
-.login-footer a { color: #7ec8ff; }
-
-/* ===== TOPBAR WITH IMAGE ===== */
-.topbar {
-  background: linear-gradient(rgba(26, 61, 109, 0.88), rgba(26, 61, 109, 0.88)),
-              url('https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=1920&q=80') center/cover no-repeat;
-  background-blend-mode: multiply;
-}
-
-/* ===== SECTION HEADER IMAGES ===== */
-
-/* Each card gets a small image on the left */
-.card h3 {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.card h3::before {
-  content: '';
-  display: inline-block;
-  width: 32px;
-  height: 32px;
-  background: #e9eef5;
-  border-radius: 6px;
-  background-size: cover;
-  background-position: center;
-  flex-shrink: 0;
-}
-
-/* Specific images per section type */
-.card.section-students h3::before {
-  background-image: url('https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=100&q=80');
-}
-.card.section-courses h3::before {
-  background-image: url('https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=100&q=80');
-}
-.card.section-exams h3::before {
-  background-image: url('https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=100&q=80');
-}
-.card.section-answers h3::before {
-  background-image: url('https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=100&q=80');
-}
-.card.section-grading h3::before {
-  background-image: url('https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=100&q=80');
-}
-.card.section-rank h3::before {
-  background-image: url('https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=100&q=80');
-}
-.card.section-ai h3::before {
-  background-image: url('https://images.unsplash.com/photo-1677442136019-21780ecad995?w=100&q=80');
-}
-.card.section-summary h3::before {
-  background-image: url('https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=100&q=80');
-}
-.card.section-results h3::before {
-  background-image: url('https://images.unsplash.com/photo-1606761568499-6d2451b23c66?w=100&q=80');
-}
-.card.section-requests h3::before {
-  background-image: url('https://images.unsplash.com/photo-1596526131083-e8c633c948d2?w=100&q=80');
-}
-
-/* Banner image on top of each tab view */
-.tab-banner {
-  height: 110px;
-  border-radius: 10px;
-  background-size: cover;
-  background-position: center;
-  margin-bottom: 16px;
-  position: relative;
-  overflow: hidden;
-  display: flex;
-  align-items: flex-end;
-  padding: 16px;
-  color: white;
-  font-weight: bold;
-  font-size: 18px;
-  text-shadow: 2px 2px 6px rgba(0,0,0,0.8);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-}
-
-.tab-banner::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(rgba(0,0,0,0.2), rgba(0,0,0,0.55));
-}
-
-.tab-banner > span { position: relative; z-index: 1; }
-
-/* Per-tab banner images */
-.banner-students { background-image: url('https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=1200&q=80'); }
-.banner-courses  { background-image: url('https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=1200&q=80'); }
-.banner-exams    { background-image: url('https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=1200&q=80'); }
-.banner-answers  { background-image: url('https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=1200&q=80'); }
-.banner-grading  { background-image: url('https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=1200&q=80'); }
-.banner-rank     { background-image: url('https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=1200&q=80'); }
-.banner-ai       { background-image: url('https://images.unsplash.com/photo-1677442136019-21780ecad995?w=1200&q=80'); }
-.banner-results  { background-image: url('https://images.unsplash.com/photo-1606761568499-6d2451b23c66?w=1200&q=80'); }
-.banner-overview { background-image: url('https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=1200&q=80'); }
-.banner-requests { background-image: url('https://images.unsplash.com/photo-1596526131083-e8c633c948d2?w=1200&q=80'); }
-
-
-
-
-
