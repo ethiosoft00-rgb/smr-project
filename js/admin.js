@@ -326,15 +326,25 @@ async function askAI() {
   var q = document.getElementById('aiQuestion').value.trim();
   var out = document.getElementById('aiAnswer');
   if (!q) { out.textContent = 'Type a question first.'; return; }
+
+  var imageBase64 = null;
+  var fileInput = document.getElementById('aiAdminFile');
+  if (fileInput && fileInput.files && fileInput.files[0]) {
+    out.textContent = 'Reading your image...';
+    try { imageBase64 = await fileToBase64(fileInput.files[0]); } catch (e) { imageBase64 = null; }
+  }
+
   out.textContent = 'Thinking...';
   try {
     var profilesResult = await supabase.from('profiles').select('id, role, full_name, login_id').limit(100);
     var subsResult = await supabase.from('submissions').select('id, student_id, exam_id, total_score, status').limit(100);
-    var answer = await askAIForAdmin(q, profilesResult.data || [], subsResult.data || []);
+    var answer = await askAIForAdmin(q, profilesResult.data || [], subsResult.data || [], imageBase64);
     out.textContent = answer;
-  } catch (e) { out.textContent = 'Error: ' + e.message; }
+    if (typeof clearAiAdminImage === 'function') clearAiAdminImage();
+  } catch (e) {
+    out.textContent = 'Error: ' + e.message;
+  }
 }
-
 init();
 
 var currentDetailStudentId = null;
@@ -1989,6 +1999,7 @@ async function executeChangeOwnPassword(newPw, secretCode) {
   msgEl.textContent = 'Password changed successfully. Use the new password next time you log in.';
   await loadMyAccountInfo();
 }
+
 
 
 

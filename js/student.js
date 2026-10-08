@@ -202,11 +202,22 @@ async function askAI() {
   var out = document.getElementById('aiAnswer');
   if (!q) { out.textContent = 'Type a question.'; return; }
   if (!currentProfile) { out.textContent = 'Loading...'; return; }
-  out.textContent = 'Thinking...';
-  try { out.textContent = await askAIForStudent(q, currentProfile, myResults, myRanks); }
-  catch (e) { out.textContent = 'Error: ' + e.message; }
-}
 
+  var imageBase64 = null;
+  var fileInput = document.getElementById('aiTutorFile');
+  if (fileInput && fileInput.files && fileInput.files[0]) {
+    out.textContent = 'Reading your image...';
+    try { imageBase64 = await fileToBase64(fileInput.files[0]); } catch (e) { imageBase64 = null; }
+  }
+
+  out.textContent = 'Thinking...';
+  try {
+    out.textContent = await askAIForStudent(q, currentProfile, myResults, myRanks, imageBase64);
+    if (typeof clearAiTutorImage === 'function') clearAiTutorImage();
+  } catch (e) {
+    out.textContent = 'Error: ' + e.message;
+  }
+}
 init();
 
 
@@ -316,6 +327,7 @@ function printResult() {
   printWindow.document.close();
   setTimeout(function () { printWindow.print(); }, 500);
 }
+
 
 
 

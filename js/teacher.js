@@ -816,32 +816,7 @@ async function runAllAIOCR() {
     msgEl.textContent = 'Could not detect any answers. ' + (errors.length > 0 ? 'Details: ' + errors.join(' | ') : '');
   }
 }
-var cameraStream = null;
-async function openCamera() {
-  var modal = document.getElementById('cameraModal');
-  var video = document.getElementById('cameraVideo');
-  modal.style.display = 'flex';
-  try {
-    cameraStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
-    video.srcObject = cameraStream;
-  } catch (err) { alert('Camera error: ' + err.message); closeCamera(); }
-}
-function capturePhoto() {
-  var video = document.getElementById('cameraVideo');
-  var canvas = document.getElementById('cameraCanvas');
-  canvas.width = video.videoWidth; canvas.height = video.videoHeight;
-  canvas.getContext('2d').drawImage(video, 0, 0);
-  canvas.toBlob(function (blob) {
-    var file = new File([blob], 'camera_' + Date.now() + '.jpg', { type: 'image/jpeg' });
-    filePreviews.studentSheets.push({ file: file, name: file.name, size: Math.round(file.size / 1024) + ' KB' });
-    renderFileList('studentSheets');
-    closeCamera();
-  }, 'image/jpeg', 0.85);
-}
-function closeCamera() {
-  if (cameraStream) { cameraStream.getTracks().forEach(function (t) { t.stop(); }); cameraStream = null; }
-  document.getElementById('cameraModal').style.display = 'none';
-}
+
 
 // ====== AI ASSISTANT ======
 
@@ -868,26 +843,34 @@ function useAiSuggestion(text) {
 }
 
 async function askAI() {
-  var inputEl = document.getElementById('aiQuestion');
-  var q = inputEl.value.trim();
+  var q = document.getElementById('aiQuestion').value.trim();
   var out = document.getElementById('aiAnswer');
-  if (!q) { out.textContent = 'Type a question.'; return; }
-
-  out.textContent = 'Thinking...';
-  document.getElementById('aiSuggestions').innerHTML = '';
+  if (!q) { out.textContent = 'Type a question first.'; return; }
 
   var userResult = await supabase.auth.getUser();
+  if (!userResult.data.user) { out.textContent = 'You are not logged in.'; return; }
+
   var profileResult = await supabase.from('profiles').select('*').eq('id', userResult.data.user.id).single();
+  if (!profileResult.data) { out.textContent = 'Could not load your profile.'; return; }
+
+  var imageBase64 = null;
+  var fileInput = document.getElementById('aiTeacherFile');
+  if (fileInput && fileInput.files && fileInput.files[0]) {
+    out.textContent = 'Reading your image...';
+    try { imageBase64 = await fileToBase64(fileInput.files[0]); } catch (e) { imageBase64 = null; }
+  }
+
+  out.textContent = 'Thinking...';
   try {
     var examsResult = await supabase.from('exams').select('*, courses(name)').eq('teacher_id', userResult.data.user.id);
     var studentsResult = await supabase.from('profiles').select('id, full_name, login_id, grade_level, section, field').eq('role', 'student').limit(50);
-    var answer = await askAIForTeacher(q, profileResult.data, examsResult.data || [], studentsResult.data || []);
+    var answer = await askAIForTeacher(q, profileResult.data, examsResult.data || [], studentsResult.data || [], imageBase64);
     out.textContent = answer;
-    inputEl.value = '';  // Clear the input after answering
-    showSuggestedQuestions();
-  } catch (e) { out.textContent = 'Error: ' + e.message; }
+    if (typeof clearAiTeacherImage === 'function') clearAiTeacherImage();
+  } catch (e) {
+    out.textContent = 'Error: ' + e.message;
+  }
 }
-
 init();
 
 
@@ -1740,4 +1723,75 @@ async function testAIProxy() {
 
 
 
+
+
+// ============================================================
+// CAMERA (works with any file input)
+// ============================================================
+
+var cameraStream = null;
+var cameraTargetInputId = 'ocrFile';
+
+async function openCameraFor(targetInputId) {
+  cameraTargetInputId = targetInputId || 'ocrFile';
+  var modal = document.getElementById('cameraModal');
+  var video = document.getElementById('cameraVideo');
+  modal.style.display = 'flex';
+  try {
+    cameraStream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 720 } }
+    });
+    video.srcObject = cameraStream;
+  } catch (err) {
+    alert('Camera error: ' + err.message);
+    closeCamera();
+  }
+}
+
+// Backwards-compatible alias
+async function openCamera() {
+  return openCameraFor('ocrFile');
+}
+
+function capturePhoto() {
+  var video = document.getElementById('cameraVideo');
+  var canvas = document.getElementById('cameraCanvas');
+  canvas.width = video.videoWidth;
+  canvas.height = video.videoHeight;
+  canvas.getContext('2d').drawImage(video, 0, 0);
+  canvas.toBlob(function (blob) {
+    var file = new File([blob], 'camera_' + Date.now() + '.jpg', { type: 'image/jpeg' });
+    var dt = new DataTransfer();
+    dt.items.add(file);
+
+    var target = document.getElementById(cameraTargetInputId);
+    if (target) {
+      // Handle single-file input
+      target.files = dt.files;
+      // If the input is for multi-file preview, also add to the preview
+      if (cameraTargetInputId === 'ocrFile' && typeof filePreviews !== 'undefined') {
+        filePreviews.studentSheets.push({ file: file, name: file.name, size: Math.round(file.size / 1024) + ' KB' });
+        if (typeof renderFileList === 'function') renderFileList('studentSheets');
+      }
+      if (cameraTargetInputId === 'questionPaperFile' && typeof filePreviews !== 'undefined') {
+        filePreviews.questionPaper.push({ file: file, name: file.name, size: Math.round(file.size / 1024) + ' KB' });
+        if (typeof renderFileList === 'function') renderFileList('questionPaper');
+      }
+      if (cameraTargetInputId === 'answerKeyFile' && typeof filePreviews !== 'undefined') {
+        filePreviews.answerKey.push({ file: file, name: file.name, size: Math.round(file.size / 1024) + ' KB' });
+        if (typeof renderFileList === 'function') renderFileList('answerKey');
+      }
+    }
+    closeCamera();
+  }, 'image/jpeg', 0.85);
+}
+
+function closeCamera() {
+  if (cameraStream) {
+    cameraStream.getTracks().forEach(function (t) { t.stop(); });
+    cameraStream = null;
+  }
+  var modal = document.getElementById('cameraModal');
+  if (modal) modal.style.display = 'none';
+}
 

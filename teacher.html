@@ -129,6 +129,7 @@
       <div style="background:#f0f7ff;padding:10px;border-radius:6px;margin-top:10px;border-left:3px solid #6c5ce7;">
         <p style="margin:0 0 6px 0;font-size:13px;font-weight:bold;">A) Question Paper(s) — you can add multiple pages</p>
         <input type="file" id="questionPaperFile" accept="image/*" multiple />
+        <button class="primary" onclick="openCameraFor('questionPaperFile')" style="background:#00b894;margin-top:6px;">&#128247; Take Photo</button>
         <button class="primary" onclick="addFilesToPreview('questionPaper')" style="background:#6c5ce7;margin-top:6px;">Add to List</button>
         <div id="qpFileList" style="margin-top:8px;"></div>
         <button class="primary" onclick="readAllQuestionPapers()" style="background:#6c5ce7;margin-top:6px;">Read All Question Papers (AI)</button>
@@ -142,6 +143,7 @@
       <div style="background:#fff4e6;padding:10px;border-radius:6px;margin-top:10px;border-left:3px solid #e67e22;">
         <p style="margin:0 0 6px 0;font-size:13px;font-weight:bold;">B) Answer Key Sheet(s) — you can add multiple pages</p>
         <input type="file" id="answerKeyFile" accept="image/*" multiple />
+        <button class="primary" onclick="openCameraFor('answerKeyFile')" style="background:#00b894;margin-top:6px;">&#128247; Take Photo</button>
         <button class="primary" onclick="addFilesToPreview('answerKey')" style="background:#e67e22;margin-top:6px;">Add to List</button>
         <div id="akFileList" style="margin-top:8px;"></div>
         <button class="primary" onclick="readAllAnswerKeys()" style="background:#e67e22;margin-top:6px;">Read All Answer Keys (AI)</button>
@@ -252,10 +254,61 @@
   <div id="view-ai" class="view" style="display:none"><div class="tab-banner banner-ai"><span>AI Assistant</span></div><div class="card"><h3>Featured — AI</h3><div class="image-gallery"><div class="image-tile tile-ai"><span>AI Assistant</span></div><div class="image-tile tile-chart"><span>Analytics</span></div><div class="image-tile tile-reading"><span>Study</span></div></div></div>
     <div class="card">
       <h3>AI Assistant (Teacher)</h3>
+      <p style="color:#666;font-size:13px;">Ask about students, courses, or exams. Attach a photo for analysis.</p>
       <input type="text" id="aiQuestion" placeholder="Ask a question..." onkeydown="if(event.key==='Enter')askAI()" />
-      <button class="primary" onclick="askAI()">Ask</button>
+      <input type="file" id="aiTeacherFile" accept="image/*" capture="environment" style="margin-top:8px;" />
+      <button class="primary" onclick="openCameraFor('aiTeacherFile')" style="background:#00b894;margin-top:6px;">&#128247; Take Photo</button>
+      <div id="aiTeacherPreview" style="margin-top:8px;display:none;">
+        <img id="aiTeacherPreviewImg" style="max-width:120px;border-radius:8px;border:2px solid #1a73e8;" />
+        <button class="link" onclick="clearAiTeacherImage()" style="color:#e74c3c;">Remove image</button>
+      </div>
+
+      <script>
+        document.getElementById('aiTeacherFile').addEventListener('change', function (e) {
+          if (e.target.files && e.target.files[0]) {
+            var reader = new FileReader();
+            reader.onload = function (ev) {
+              document.getElementById('aiTeacherPreviewImg').src = ev.target.result;
+              document.getElementById('aiTeacherPreview').style.display = 'block';
+            };
+            reader.readAsDataURL(e.target.files[0]);
+          }
+        });
+        function clearAiTeacherImage() {
+          document.getElementById('aiTeacherFile').value = '';
+          document.getElementById('aiTeacherPreviewImg').src = '';
+          document.getElementById('aiTeacherPreview').style.display = 'none';
+        }
+      </script>
+
+      <input type="file" id="aiTeacherFile" accept="image/*" capture="environment" style="margin-top:8px;" />
+      <button class="primary" onclick="openCameraFor('aiTeacherFile')" style="background:#00b894;margin-top:6px;">&#128247; Take Photo</button>
+      <div id="aiTeacherPreview" style="margin-top:8px;display:none;">
+        <img id="aiTeacherPreviewImg" style="max-width:120px;border-radius:8px;border:2px solid #1a73e8;" />
+        <button class="link" onclick="clearAiTeacherImage()" style="color:#e74c3c;">Remove image</button>
+      </div>
+
+      <button class="primary" onclick="askAI()" style="margin-top:10px;">Ask</button>
       <div id="aiSuggestions"></div>
       <div id="aiAnswer" style="margin-top:12px;white-space:pre-wrap;"></div>
+
+      <script>
+        document.getElementById('aiTeacherFile').addEventListener('change', function (e) {
+          if (e.target.files && e.target.files[0]) {
+            var reader = new FileReader();
+            reader.onload = function (ev) {
+              document.getElementById('aiTeacherPreviewImg').src = ev.target.result;
+              document.getElementById('aiTeacherPreview').style.display = 'block';
+            };
+            reader.readAsDataURL(e.target.files[0]);
+          }
+        });
+        function clearAiTeacherImage() {
+          document.getElementById('aiTeacherFile').value = '';
+          document.getElementById('aiTeacherPreviewImg').src = '';
+          document.getElementById('aiTeacherPreview').style.display = 'none';
+        }
+      </script>
     </div>
   </div>
 
@@ -372,6 +425,11 @@ function closeMobileMenu(e) {
 
 </body>
 </html>
+
+
+
+
+
 
 
 

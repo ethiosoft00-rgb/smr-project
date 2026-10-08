@@ -70,9 +70,36 @@
   <div id="view-ai" class="view" style="display:none">
     <div class="card">
       <h3>AI Tutor</h3>
+      <p style="font-size:13px;color:#666;">Ask any question. Attach a photo of your homework or diagram for a better answer.</p>
       <input type="text" id="aiQuestion" placeholder="Ask about your results..." />
-      <button class="primary" onclick="askAI()">Ask</button>
+
+      <input type="file" id="aiTutorFile" accept="image/*" capture="environment" style="margin-top:8px;" />
+      <button class="primary" onclick="openCameraFor('aiTutorFile')" style="background:#00b894;margin-top:6px;">&#128247; Take Photo</button>
+      <div id="aiTutorPreview" style="margin-top:8px;display:none;">
+        <img id="aiTutorPreviewImg" style="max-width:120px;border-radius:8px;border:2px solid #1a73e8;" />
+        <button class="link" onclick="clearAiTutorImage()" style="color:#e74c3c;">Remove image</button>
+      </div>
+
+      <button class="primary" onclick="askAI()" style="margin-top:10px;">Ask</button>
       <div id="aiAnswer" style="margin-top:12px;white-space:pre-wrap;"></div>
+
+      <script>
+        document.getElementById('aiTutorFile').addEventListener('change', function (e) {
+          if (e.target.files && e.target.files[0]) {
+            var reader = new FileReader();
+            reader.onload = function (ev) {
+              document.getElementById('aiTutorPreviewImg').src = ev.target.result;
+              document.getElementById('aiTutorPreview').style.display = 'block';
+            };
+            reader.readAsDataURL(e.target.files[0]);
+          }
+        });
+        function clearAiTutorImage() {
+          document.getElementById('aiTutorFile').value = '';
+          document.getElementById('aiTutorPreviewImg').src = '';
+          document.getElementById('aiTutorPreview').style.display = 'none';
+        }
+      </script>
     </div>
   </div>
 
@@ -116,3 +143,4 @@ function closeMobileMenu() {
 
 </body>
 </html>
+

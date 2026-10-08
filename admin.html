@@ -239,10 +239,37 @@
   <div id="view-ai" class="view" style="display:none"><div class="tab-banner banner-ai"><span>AI Assistant</span></div>
     <div class="card">
       <h3>AI Assistant (Admin)</h3>
+      <p style="color:#666;font-size:13px;">Ask about students, teachers, or the system. Attach an image for analysis.</p>
       <p style="color:#666;font-size:13px;">Ask about any student, teacher, or the system.</p>
       <input type="text" id="aiQuestion" placeholder="Ask a question..." />
-      <button class="primary" onclick="askAI()">Ask</button>
+
+      <input type="file" id="aiAdminFile" accept="image/*" capture="environment" style="margin-top:8px;" />
+      <button class="primary" onclick="openCameraFor('aiAdminFile')" style="background:#00b894;margin-top:6px;">&#128247; Take Photo</button>
+      <div id="aiAdminPreview" style="margin-top:8px;display:none;">
+        <img id="aiAdminPreviewImg" style="max-width:120px;border-radius:8px;border:2px solid #1a73e8;" />
+        <button class="link" onclick="clearAiAdminImage()" style="color:#e74c3c;">Remove image</button>
+      </div>
+
+      <button class="primary" onclick="askAI()" style="margin-top:10px;">Ask</button>
       <div id="aiAnswer" style="margin-top:12px;white-space:pre-wrap;"></div>
+
+      <script>
+        document.getElementById('aiAdminFile').addEventListener('change', function (e) {
+          if (e.target.files && e.target.files[0]) {
+            var reader = new FileReader();
+            reader.onload = function (ev) {
+              document.getElementById('aiAdminPreviewImg').src = ev.target.result;
+              document.getElementById('aiAdminPreview').style.display = 'block';
+            };
+            reader.readAsDataURL(e.target.files[0]);
+          }
+        });
+        function clearAiAdminImage() {
+          document.getElementById('aiAdminFile').value = '';
+          document.getElementById('aiAdminPreviewImg').src = '';
+          document.getElementById('aiAdminPreview').style.display = 'none';
+        }
+      </script>
     </div>
   </div>
 
@@ -320,6 +347,7 @@ function closeMobileMenu(e) {
 
 </body>
 </html>
+
 
 
 
