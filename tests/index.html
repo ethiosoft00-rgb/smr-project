@@ -1,0 +1,51 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>SMR — Automated Tests</title>
+<style>
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: #f0f2f5; margin: 0; padding: 20px; }
+  .container { max-width: 1000px; margin: 0 auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 16px rgba(0,0,0,0.08); }
+  h1 { color: #1a3d6d; margin-top: 0; }
+  .summary { display: flex; gap: 16px; margin: 20px 0; flex-wrap: wrap; }
+  .stat { padding: 16px 24px; border-radius: 8px; font-size: 20px; font-weight: bold; }
+  .passed { background: #e8f5e9; color: #1b5e20; }
+  .failed { background: #ffebee; color: #b71c1c; }
+  .total { background: #e3f2fd; color: #0d47a1; }
+  .time { background: #fff3e0; color: #e65100; }
+  .test-row { padding: 10px 14px; margin: 4px 0; border-radius: 6px; font-size: 14px; display: flex; align-items: center; gap: 10px; }
+  .test-pass { background: #f1f8e9; }
+  .test-fail { background: #ffebee; color: #b71c1c; }
+  .test-running { background: #e3f2fd; }
+  .group-title { margin: 24px 0 10px 0; color: #1a3d6d; font-size: 16px; border-bottom: 2px solid #e0e0e0; padding-bottom: 6px; }
+  .icon { font-size: 18px; }
+  .error-msg { font-family: monospace; font-size: 12px; color: #b71c1c; margin-left: auto; }
+  button { background: #1a73e8; color: white; border: none; padding: 12px 30px; border-radius: 8px; cursor: pointer; font-size: 15px; font-weight: bold; }
+  button:hover { background: #1558b0; }
+  button:disabled { opacity: 0.6; cursor: not-allowed; }
+</style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../js/supabase-client.js"></script>
+</head>
+<body>
+
+<div class="container">
+  <h1>SMR — Automated Test Suite</h1>
+  <p style="color:#666;">Verifies the core logic and database operations of the Student Mark Recognition system.</p>
+
+  <button id="runBtn" onclick="runAllTests()">▶ Run All Tests</button>
+
+  <div class="summary" id="summary" style="display:none;">
+    <div class="stat total">Total: <span id="totalCount">0</span></div>
+    <div class="stat passed">Passed: <span id="passedCount">0</span></div>
+    <div class="stat failed">Failed: <span id="failedCount">0</span></div>
+    <div class="stat time">Time: <span id="timeCount">0s</span></div>
+  </div>
+
+  <div id="results"></div>
+</div>
+
+<script src="tests.js"></script>
+
+</body>
+</html>

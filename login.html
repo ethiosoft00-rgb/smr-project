@@ -1,0 +1,53 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SMR - Login</title>
+<link rel="stylesheet" href="css/style.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="login-page">
+
+<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:30px 20px;box-sizing:border-box;">
+  <div style="width:100%;max-width:440px;text-align:center;">
+
+    <div style="margin-bottom:24px;">
+      <h1 style="color:white;font-size:32px;text-shadow:2px 2px 10px rgba(0,0,0,0.7);margin:0 0 8px 0;">Student Mark Recognition</h1>
+      <p style="color:#cfe2ff;font-size:15px;margin:0 0 14px 0;text-shadow:1px 1px 4px rgba(0,0,0,0.6);">For Universities, Colleges, High Schools &amp; Junior Schools</p>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;justify-content:center;">
+        <span style="background:rgba(255,255,255,0.15);color:white;padding:6px 14px;border-radius:20px;font-size:12px;border:1px solid rgba(255,255,255,0.3);">⚡ Reduce Effort</span>
+        <span style="background:rgba(255,255,255,0.15);color:white;padding:6px 14px;border-radius:20px;font-size:12px;border:1px solid rgba(255,255,255,0.3);">🎯 Reduce Errors</span>
+        <span style="background:rgba(255,255,255,0.15);color:white;padding:6px 14px;border-radius:20px;font-size:12px;border:1px solid rgba(255,255,255,0.3);">🤖 AI-Powered Grading</span>
+        <span style="background:rgba(255,255,255,0.15);color:white;padding:6px 14px;border-radius:20px;font-size:12px;border:1px solid rgba(255,255,255,0.3);">📊 Instant Rankings</span>
+        <span style="background:rgba(255,255,255,0.15);color:white;padding:6px 14px;border-radius:20px;font-size:12px;border:1px solid rgba(255,255,255,0.3);">🔒 Secure &amp; Private</span>
+      </div>
+    </div>
+
+    <div style="background:rgba(255,255,255,0.98);backdrop-filter:blur(8px);padding:36px 32px;border-radius:16px;box-shadow:0 12px 40px rgba(0,0,0,0.35);box-sizing:border-box;width:100%;">
+      <div id="msg" class="msg"></div>
+
+      <div id="loginView">
+        <input type="text" id="loginId" placeholder="Your ID" style="width:100%;padding:12px;margin:8px 0;border:1px solid #ccc;border-radius:8px;font-size:15px;box-sizing:border-box;" />
+        <input type="password" id="password" placeholder="Password" style="width:100%;padding:12px;margin:8px 0;border:1px solid #ccc;border-radius:8px;font-size:15px;box-sizing:border-box;" />
+        <button onclick="doLogin()" style="width:100%;padding:12px;margin-top:10px;background:#1a73e8;color:white;border:none;border-radius:8px;font-size:15px;cursor:pointer;font-weight:bold;">Login</button>
+        <button onclick="window.location.href='register.html'" style="width:100%;padding:8px;background:none;color:#1a73e8;border:none;text-decoration:underline;font-size:13px;cursor:pointer;">First time? Create your password</button>
+        <button onclick="showForgot()" style="width:100%;padding:8px;background:none;color:#1a73e8;border:none;text-decoration:underline;font-size:13px;cursor:pointer;">Forgot Password?</button>
+      </div>
+
+      <div id="forgotView" style="display:none;">
+        <input type="text" id="forgotId" placeholder="Your ID" style="width:100%;padding:12px;margin:8px 0;border:1px solid #ccc;border-radius:8px;font-size:15px;box-sizing:border-box;" />
+        <input type="email" id="forgotEmail" placeholder="Your Email" style="width:100%;padding:12px;margin:8px 0;border:1px solid #ccc;border-radius:8px;font-size:15px;box-sizing:border-box;" />
+        <button onclick="doForgot()" style="width:100%;padding:12px;margin-top:10px;background:#1a73e8;color:white;border:none;border-radius:8px;font-size:15px;cursor:pointer;font-weight:bold;">Send Request to Admin</button>
+        <button onclick="showLogin()" style="width:100%;padding:8px;background:none;color:#1a73e8;border:none;text-decoration:underline;font-size:13px;cursor:pointer;">Back to Login</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script src="js/supabase-client.js"></script>
+<script src="js/login.js"></script>
+
+</body>
+</html>

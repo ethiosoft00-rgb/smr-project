@@ -1,0 +1,58 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>SMR - Create Password</title>
+<link rel="stylesheet" href="css/style.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+<div class="box">
+  <h1>Create Your Password</h1>
+  <p style="font-size:13px;color:#666;text-align:center;">
+    Enter the ID given to you by the admin, then choose your own password.
+  </p>
+
+  <div id="msg" class="msg"></div>
+
+  <input type="text" id="regId" placeholder="Your ID (e.g. TCH-001)" />
+  <input type="password" id="regPw" placeholder="New Password" />
+  <input type="password" id="regPw2" placeholder="Confirm Password" />
+  <button class="primary" onclick="doRegister()">Create Account</button>
+  <button class="link" onclick="window.location.href='login.html'">Back to Login</button>
+</div>
+
+<script src="js/supabase-client.js"></script>
+<script>
+var msg = document.getElementById('msg');
+
+function showError(t) { msg.className = 'msg err'; msg.textContent = t; }
+function showOk(t)    { msg.className = 'msg ok';  msg.textContent = t; }
+
+async function doRegister() {
+  msg.className = 'msg'; msg.textContent = '';
+
+  var id  = document.getElementById('regId').value.trim();
+  var pw  = document.getElementById('regPw').value;
+  var pw2 = document.getElementById('regPw2').value;
+
+  if (!id || !pw || !pw2) return showError('Please fill in all fields.');
+  if (pw !== pw2) return showError('Passwords do not match.');
+  if (pw.length < 6) return showError('Password must be at least 6 characters.');
+
+  var result = await supabase.rpc('register_user_password', {
+    p_login_id: id,
+    p_password: pw
+  });
+
+  if (result.error) return showError('Registration failed: ' + result.error.message);
+  if (!result.data) return showError('Registration failed: unknown error.');
+
+  showOk('Account created! Redirecting to login...');
+  setTimeout(function () { window.location.href = 'login.html'; }, 1500);
+}
+</script>
+
+</body>
+</html>

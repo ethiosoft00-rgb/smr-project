@@ -1,0 +1,386 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>SMR - Teacher</title>
+<link rel="stylesheet" href="css/style.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="dashboard-page">
+
+<button class="mobile-menu-btn" onclick="openMobileMenu()" aria-label="Menu">☰</button>
+<div class="topbar">
+  <h2>📚 Teacher Dashboard</h2>
+  <div>
+    <span id="teacherName" style="margin-right: 16px;"></span>
+    <button onclick="logout()">Logout</button>
+  </div>
+</div>
+
+<div class="container">
+  <div class="tabbar">
+    <button id="tab-overview" class="active" onclick="showTab('overview')">Overview</button>
+    <button id="tab-students" onclick="showTab('students')">My Students</button>
+    <button id="tab-rank" onclick="showTab('rank')">🏆 RANK</button>
+    <button id="tab-reports" onclick="showTab('reports')">📊 Reports</button>
+    <button id="tab-courses" onclick="showTab('courses')">Courses</button>
+    <button id="tab-exams" onclick="showTab('exams')">Exams</button>
+    <button id="tab-answers" onclick="showTab('answers')">Answer Keys</button>
+    <button id="tab-grading" onclick="showTab('grading')">Grade Student</button>
+    <button id="tab-ai" onclick="showTab('ai')">AI Assistant</button>
+  </div>
+
+  <div id="view-overview" class="view"><div class="tab-banner banner-overview"><span>Teacher Overview</span></div>
+
+    <div class="card">
+      <h3>Teaching Environment</h3>
+      <div class="image-gallery">
+        <div class="image-tile tile-classroom"><span>Classroom</span></div>
+        <div class="image-tile tile-teacher"><span>Teaching</span></div>
+        <div class="image-tile tile-science"><span>Subject Areas</span></div>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Summary</h3>
+      <div class="stat">My Students: <b id="countStudents">0</b></div>
+      <div class="stat">My Courses: <b id="countCourses">0</b></div>
+      <div class="stat">My Exams: <b id="countExams">0</b></div>
+    </div>
+  </div>
+
+  <div id="view-students" class="view" style="display:none"><div class="tab-banner banner-students"><span>My Students</span></div>
+    <div class="card">
+      <h3>Register New Student</h3>
+      <input type="text" id="sFullName" placeholder="Full Name" />
+      <input type="text" id="sLoginId" placeholder="Student ID" />
+      <input type="text" id="sPhone" placeholder="Phone (optional)" />
+      <input type="text" id="sGrade" placeholder="Grade Level" />
+      <input type="text" id="sSection" placeholder="Section" />
+      <input type="text" id="sField" placeholder="Field" />
+      <button class="primary" onclick="addStudent()">Register Student</button>
+      <div id="sMsg" class="msg"></div>
+    </div>
+
+    <div class="card">
+      <h3>My Students</h3>
+      <input type="text" id="studentSearch" placeholder="Search by name, ID, or rank..." oninput="renderStudents()" style="max-width:400px;margin-bottom:12px;">
+      <div id="studentsLoadMsg" style="color:#888;font-size:13px;"></div>
+      <table>
+        <thead><tr><th>Full Name</th><th>ID</th><th>Grade</th><th>Section</th><th>Field</th><th>Total Score</th><th>Registered?</th><th>Action</th></tr></thead>
+        <tbody id="studentsTable"></tbody>
+      </table>
+    </div>
+
+    <div class="card" id="studentDetailCard" style="display:none;border-left:4px solid #1a73e8;">
+      <h3 id="sdTitle">Student Detail</h3>
+      <div id="sdInfo"></div>
+      <div id="sdRank"></div>
+      <h4 style="margin-top:16px;">Exam Results</h4>
+      <div id="sdResults">Loading...</div>
+      <div style="text-align:center;margin-top:16px;">
+        <button class="link" onclick="document.getElementById('studentDetailCard').style.display='none'">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="view-courses" class="view" style="display:none"><div class="tab-banner banner-courses"><span>Courses</span></div>
+    <div class="card">
+      <h3>Create Course</h3>
+      <input type="text" id="cName" placeholder="Course Name" />
+      <input type="text" id="cCode" placeholder="Course Code" />
+      <input type="text" id="cGrade" placeholder="Grade Level" />
+      <button class="primary" onclick="addCourse()">Create Course</button>
+      <div id="cMsg" class="msg"></div>
+    </div>
+    <div class="card">
+      <h3>My Courses</h3>
+      <table><thead><tr><th>Course</th><th>Code</th><th>Grade</th></tr></thead><tbody id="coursesTable"></tbody></table>
+    </div>
+  </div>
+
+  <div id="view-exams" class="view" style="display:none"><div class="tab-banner banner-exams"><span>Exams</span></div>
+    <div class="card">
+      <h3>Create Exam</h3>
+      <select id="eCourse"></select>
+      <input type="text" id="eTitle" placeholder="Exam Title" />
+      <input type="number" id="eMarks" placeholder="Total Marks" />
+      <button class="primary" onclick="addExam()">Create Exam</button>
+      <div id="eMsg" class="msg"></div>
+    </div>
+    <div class="card">
+      <h3>My Exams</h3>
+      <table><thead><tr><th>Title</th><th>Course</th><th>Total</th><th>Status</th><th>Action</th></tr></thead><tbody id="examsTable"></tbody></table>
+      <div style="margin-top:12px;padding:10px;background:#f7f9fc;border-radius:6px;">
+        <h4 style="margin:0 0 8px 0;">Adjust Total Marks</h4>
+        <select id="editExamSelect"></select>
+        <input type="number" id="editTotalMarks" placeholder="New Total Marks" />
+        <button class="primary" onclick="updateExamTotal()">Save</button>
+        <div id="editExamMsg" class="msg"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="view-answers" class="view" style="display:none"><div class="tab-banner banner-answers"><span>Answer Keys</span></div><div class="card"><h3>Featured — Answer Sheets</h3><div class="image-gallery"><div class="image-tile tile-notebook"><span>Answer Keys</span></div><div class="image-tile tile-writing"><span>Writing</span></div><div class="image-tile tile-exam"><span>Exams</span></div></div></div>
+    <div class="card">
+      <h3>Bulk Import Answer Key</h3>
+      <select id="akExam"></select>
+
+      <div style="background:#f0f7ff;padding:10px;border-radius:6px;margin-top:10px;border-left:3px solid #6c5ce7;">
+        <p style="margin:0 0 6px 0;font-size:13px;font-weight:bold;">A) Question Paper(s) — you can add multiple pages</p>
+        <input type="file" id="questionPaperFile" accept="image/*" multiple />
+        <button class="primary" onclick="addFilesToPreview('questionPaper')" style="background:#6c5ce7;margin-top:6px;">Add to List</button>
+        <div id="qpFileList" style="margin-top:8px;"></div>
+        <button class="primary" onclick="readAllQuestionPapers()" style="background:#6c5ce7;margin-top:6px;">Read All Question Papers (AI)</button>
+        <div id="qpProgress" style="font-size:12px;color:#666;margin-top:6px;"></div>
+        <div id="qpMsg" class="msg"></div>
+      </div>
+
+      <label style="font-size:13px;font-weight:bold;margin-top:12px;display:block;">Questions (required)</label>
+      <textarea id="akBulkQuestions" placeholder="1.What is 2+2? 2.Capital of France? 3.Who wrote Hamlet?" style="width:100%;height:80px;padding:8px;font-size:13px;"></textarea>
+
+      <div style="background:#fff4e6;padding:10px;border-radius:6px;margin-top:10px;border-left:3px solid #e67e22;">
+        <p style="margin:0 0 6px 0;font-size:13px;font-weight:bold;">B) Answer Key Sheet(s) — you can add multiple pages</p>
+        <input type="file" id="answerKeyFile" accept="image/*" multiple />
+        <button class="primary" onclick="addFilesToPreview('answerKey')" style="background:#e67e22;margin-top:6px;">Add to List</button>
+        <div id="akFileList" style="margin-top:8px;"></div>
+        <button class="primary" onclick="readAllAnswerKeys()" style="background:#e67e22;margin-top:6px;">Read All Answer Keys (AI)</button>
+        <div id="akImgProgress" style="font-size:12px;color:#666;margin-top:6px;"></div>
+        <div id="akImgMsg" class="msg"></div>
+      </div>
+
+      <label style="font-size:13px;font-weight:bold;margin-top:12px;display:block;">Correct Answers (required)</label>
+      <textarea id="akBulk" placeholder="1.A 2.B 3.C" style="width:100%;height:80px;padding:8px;font-family:monospace;font-size:14px;"></textarea>
+
+      <input type="number" id="akBulkMarks" placeholder="Marks per question" value="1" />
+      <button class="primary" onclick="addBulkAnswerKey()" style="background:#28a745;">Import All</button>
+      <div id="akBulkMsg" class="msg"></div>
+    </div>
+
+    <div class="card">
+      <h3>Current Answer Key</h3>
+      <select id="akViewExam" onchange="loadAnswerKeyView()"></select>
+      <button class="link" onclick="clearAnswerKey()" style="color:#c00;margin-top:6px;">Clear entire key</button>
+      <table>
+        <thead><tr><th>Q#</th><th>Question</th><th>Correct Answer</th><th>Marks (editable)</th><th>Type</th><th>Save</th></tr></thead>
+        <tbody id="akTable"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div id="view-grading" class="view" style="display:none"><div class="tab-banner banner-grading"><span>Grade Student</span></div><div class="card"><h3>Featured — Grading</h3><div class="image-gallery"><div class="image-tile tile-students"><span>Students</span></div><div class="image-tile tile-library"><span>Library</span></div><div class="image-tile tile-bahirdar"><span>School</span></div></div></div>
+    <div class="card">
+      <h3>Step 1 — Pick Exam and Student</h3>
+      <select id="grExam" onchange="loadStudentsForGrading()"></select>
+      <select id="grStudent"></select>
+      <button class="primary" onclick="startGrading()">Start Grading</button>
+      <div id="grMsg" class="msg"></div>
+    </div>
+
+    <div class="card" id="ocrCard" style="display:none;border-left:4px solid #1a73e8;">
+      <h3>Step 2 — Upload Student Answer Sheet(s)</h3>
+      <p style="font-size:13px;color:#666;">Add multiple pages if the student wrote on more than one sheet.</p>
+      <input type="file" id="ocrFile" accept="image/*" multiple />
+      <button class="primary" onclick="addFilesToPreview('studentSheets')" style="background:#5a6b82;margin-top:6px;">Add to List</button>
+      <button class="primary" onclick="openCamera()" style="background:#00b894;margin-top:6px;">📷 Take Photo</button>
+      <div id="stFileList" style="margin-top:8px;"></div>
+      <button class="primary" onclick="runAllAIOCR()" style="background:#1a73e8;margin-top:6px;">AI Read All Pages</button>
+      <button class="primary" onclick="runLocalOCR()" style="background:#5a6b82;margin-top:6px;">Local OCR (single)</button>
+      <div id="ocrMsg" class="msg"></div>
+      <div id="ocrProgress" style="font-size:13px;color:#666;margin-top:8px;"></div>
+      <div id="ocrPreview" style="margin-top:12px;display:none;">
+        <p style="font-size:13px;font-weight:bold;">Detected Text:</p>
+        <pre id="ocrText" style="background:#f5f5f5;padding:10px;border-radius:6px;max-height:200px;overflow:auto;font-size:12px;"></pre>
+      </div>
+    </div>
+
+    <div id="gradingForm" class="card" style="display:none">
+      <h3>Step 3 — Review and Save</h3>
+      <div id="gradingQuestions"></div>
+      <button class="primary" onclick="submitGrading()">Save Results</button>
+      <div id="grResultMsg" class="msg"></div>
+    </div>
+  </div>
+
+  <div id="view-rank" class="view" style="display:none"><div class="tab-banner banner-rank"><span>Rankings</span></div><div class="card"><h3>Featured — Performance</h3><div class="image-gallery"><div class="image-tile tile-trophy"><span>Rankings</span></div><div class="image-tile tile-chart"><span>Performance</span></div><div class="image-tile tile-graduation"><span>Graduation</span></div></div></div>
+    <div class="card" style="border-left:4px solid #00b894;">
+      <h3>🏆 Cumulative Rankings (All Students, All Exams)</h3>
+      <p style="font-size:13px;color:#666;">Full details: name, ID, grade, field, total score, average, rank.</p>
+      <div style="display:flex;gap:10px;margin-bottom:12px;flex-wrap:wrap;"><input type="text" id="rankSearch" placeholder="Search by name, ID, grade, field..." oninput="renderCumulativeRankTable()" style="max-width:400px;flex:1;" /><button onclick="exportRankingsCSV()" style="background:#28a745;color:white;border:none;padding:10px 20px;border-radius:6px;cursor:pointer;font-weight:bold;">📥 Export to CSV</button></div><div id="rankFullTable">Loading...</div>
+    </div>
+  </div>
+
+  <div id="view-reports" class="view" style="display:none">
+    <div class="tab-banner banner-rank"><span>Bulk Reports</span></div>
+
+    <div class="card" style="border-left:4px solid #00b894;">
+      <h3>📊 Group Report by Category</h3>
+      <p style="font-size:13px;color:#666;">Filter students by grade, field, section, or exam. Then print or download the group.</p>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px;">
+        <div>
+          <label style="font-size:12px;font-weight:bold;display:block;margin-bottom:4px;">Grade Level</label>
+          <select id="brGrade"><option value="">All grades</option></select>
+        </div>
+        <div>
+          <label style="font-size:12px;font-weight:bold;display:block;margin-bottom:4px;">Field</label>
+          <select id="brField"><option value="">All fields</option></select>
+        </div>
+        <div>
+          <label style="font-size:12px;font-weight:bold;display:block;margin-bottom:4px;">Section</label>
+          <select id="brSection"><option value="">All sections</option></select>
+        </div>
+        <div>
+          <label style="font-size:12px;font-weight:bold;display:block;margin-bottom:4px;">Exam</label>
+          <select id="brExam"><option value="">All exams (cumulative)</option></select>
+        </div>
+      </div>
+
+      <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap;">
+        <button onclick="previewBulkReport()" style="background:#1a73e8;color:white;border:none;padding:10px 20px;border-radius:6px;cursor:pointer;font-weight:bold;">🔍 Preview Group</button>
+        <button onclick="printBulkReport()" style="background:#6c5ce7;color:white;border:none;padding:10px 20px;border-radius:6px;cursor:pointer;font-weight:bold;">🖨️ Print Group</button>
+        <button onclick="downloadBulkReportCSV()" style="background:#28a745;color:white;border:none;padding:10px 20px;border-radius:6px;cursor:pointer;font-weight:bold;">📥 Download CSV</button>
+        <button onclick="downloadBulkReportPDF()" style="background:#e67e22;color:white;border:none;padding:10px 20px;border-radius:6px;cursor:pointer;font-weight:bold;">📄 Download PDF</button>
+        <button onclick="printEachStudentInGroup()" style="background:#e67e22;color:white;border:none;padding:10px 20px;border-radius:6px;cursor:pointer;font-weight:bold;">📄 Print Each Student</button>
+      </div>
+
+      <div id="brMsg" class="msg"></div>
+      <div id="brPreview" style="margin-top:16px;"></div>
+    </div>
+  </div>
+
+  <div id="view-ai" class="view" style="display:none"><div class="tab-banner banner-ai"><span>AI Assistant</span></div><div class="card"><h3>Featured — AI</h3><div class="image-gallery"><div class="image-tile tile-ai"><span>AI Assistant</span></div><div class="image-tile tile-chart"><span>Analytics</span></div><div class="image-tile tile-reading"><span>Study</span></div></div></div>
+    <div class="card">
+      <h3>AI Assistant (Teacher)</h3>
+      <input type="text" id="aiQuestion" placeholder="Ask a question..." onkeydown="if(event.key==='Enter')askAI()" />
+      <button class="primary" onclick="askAI()">Ask</button>
+      <div id="aiSuggestions"></div>
+      <div id="aiAnswer" style="margin-top:12px;white-space:pre-wrap;"></div>
+    </div>
+  </div>
+
+  <div style="text-align:center;margin:20px;">
+      <button onclick="testAIProxy()" style="background:#6c5ce7;color:white;border:none;padding:12px 24px;border-radius:8px;cursor:pointer;font-weight:bold;font-size:14px;">🧪 Test AI Connection</button>
+      <div id="aiTestResult" style="margin-top:12px;padding:12px;border-radius:6px;font-size:14px;display:none;"></div>
+    </div>
+
+    <div style="text-align:center;margin-top:24px;font-size:12px;color:#666;">
+    Customer Service: <a href="https://t.me/TE21HUSH" target="_blank">@TE21HUSH</a>
+  </div>
+</div>
+
+<div id="cameraModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.9);z-index:9999;align-items:center;justify-content:center;flex-direction:column;">
+  <video id="cameraVideo" autoplay playsinline style="max-width:90%;max-height:70%;border-radius:8px;"></video>
+  <div style="margin-top:16px;">
+    <button class="primary" onclick="capturePhoto()" style="background:#00b894;padding:12px 30px;">📸 Capture</button>
+    <button class="primary" onclick="closeCamera()" style="background:#e74c3c;padding:12px 30px;margin-left:10px;">✕ Cancel</button>
+  </div>
+  <canvas id="cameraCanvas" style="display:none;"></canvas>
+</div>
+
+<!-- DOWNLOAD OPTIONS MODAL -->
+  <div id="downloadModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.75);z-index:9999;align-items:center;justify-content:center;padding:20px;">
+    <div style="background:white;border-radius:12px;max-width:520px;width:100%;max-height:90vh;overflow:auto;padding:26px;">
+      <h3 style="margin-top:0;color:#1a3d6d;">📥 Download Exam Results</h3>
+      <p style="color:#666;font-size:13px;margin-bottom:16px;">Exam: <b id="dlExamName"></b></p>
+
+      <p style="font-weight:bold;font-size:13px;margin-bottom:8px;">Include columns:</p>
+
+      <label style="display:block;margin:6px 0;font-size:14px;">
+        <input type="checkbox" id="dlName" checked style="width:auto;margin-right:8px;"> Student Name
+      </label>
+      <label style="display:block;margin:6px 0;font-size:14px;">
+        <input type="checkbox" id="dlId" checked style="width:auto;margin-right:8px;"> Student ID
+      </label>
+      <label style="display:block;margin:6px 0;font-size:14px;">
+        <input type="checkbox" id="dlGrade" checked style="width:auto;margin-right:8px;"> Grade Level
+      </label>
+      <label style="display:block;margin:6px 0;font-size:14px;">
+        <input type="checkbox" id="dlField" checked style="width:auto;margin-right:8px;"> Field
+      </label>
+      <label style="display:block;margin:6px 0;font-size:14px;">
+        <input type="checkbox" id="dlSection" style="width:auto;margin-right:8px;"> Section
+      </label>
+      <label style="display:block;margin:6px 0;font-size:14px;">
+        <input type="checkbox" id="dlScore" checked style="width:auto;margin-right:8px;"> Score / Total
+      </label>
+      <label style="display:block;margin:6px 0;font-size:14px;">
+        <input type="checkbox" id="dlPercent" checked style="width:auto;margin-right:8px;"> Percentage
+      </label>
+      <label style="display:block;margin:6px 0;font-size:14px;">
+        <input type="checkbox" id="dlRank" checked style="width:auto;margin-right:8px;"> Rank
+      </label>
+      <label style="display:block;margin:6px 0;font-size:14px;">
+        <input type="checkbox" id="dlStatus" style="width:auto;margin-right:8px;"> Confirm Status
+      </label>
+
+      <div style="background:#f7f9fc;padding:10px;border-radius:6px;margin:16px 0;font-size:13px;">
+        <label style="display:block;margin:4px 0;">
+          <input type="radio" name="dlFormat" value="csv" checked style="width:auto;margin-right:6px;"> Download as CSV (Excel)
+        </label>
+        <label style="display:block;margin:4px 0;">
+          <input type="radio" name="dlFormat" value="pdf" style="width:auto;margin-right:6px;"> Download as PDF
+        </label>
+      </div>
+
+      <div style="display:flex;gap:10px;justify-content:flex-end;">
+        <button onclick="closeDownloadModal()" style="background:#5a6b82;color:white;border:none;padding:10px 20px;border-radius:6px;cursor:pointer;font-weight:bold;">Cancel</button>
+        <button onclick="executeDownload()" style="background:#28a745;color:white;border:none;padding:10px 20px;border-radius:6px;cursor:pointer;font-weight:bold;">📥 Download</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+<script src="js/supabase-client.js"></script>
+<script src="js/ai.js"></script>
+<script src="js/teacher.js"></script>
+
+<div class="mobile-menu-overlay" id="mobileMenuOverlay" onclick="closeMobileMenu(event)">
+  <div class="mobile-menu-drawer" onclick="event.stopPropagation()">
+    <div class="mobile-menu-header">
+      <span>SMR Menu</span>
+      <button onclick="closeMobileMenu()" aria-label="Close">×</button>
+    </div>
+    <div class="mobile-menu-list" id="mobileMenuList"></div>
+  </div>
+</div>
+<script>
+function openMobileMenu() {
+  var overlay = document.getElementById('mobileMenuOverlay');
+  var list = document.getElementById('mobileMenuList');
+  var tabs = document.querySelectorAll('.tabbar button');
+  list.innerHTML = '';
+  tabs.forEach(function (t) {
+    var btn = document.createElement('button');
+    btn.innerHTML = t.innerHTML;
+    btn.onclick = function () {
+      t.click();
+      closeMobileMenu();
+    };
+    if (t.classList.contains('active')) btn.className = 'active';
+    list.appendChild(btn);
+  });
+  overlay.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeMobileMenu(e) {
+  var overlay = document.getElementById('mobileMenuOverlay');
+  overlay.classList.remove('open');
+  document.body.style.overflow = '';
+}
+</script>
+
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+

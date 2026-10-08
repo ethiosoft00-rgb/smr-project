@@ -1,0 +1,338 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>SMR - Admin</title>
+<link rel="stylesheet" href="css/style.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="dashboard-page">
+
+<button class="mobile-menu-btn" onclick="openMobileMenu()" aria-label="Menu">☰</button>
+<div class="topbar">
+  <h2>🏛️ Admin Dashboard</h2>
+  <div>
+    <span id="adminName" style="margin-right: 16px;"></span>
+    <button onclick="logout()">Logout</button>
+  </div>
+</div>
+
+<div class="container">
+  <div class="tabbar">
+    <button id="tab-overview" class="active" onclick="showTab('overview')">Overview</button>
+    <button id="tab-students" onclick="showTab('students')">Students</button>
+    <button id="tab-teachers" onclick="showTab('teachers')">Teachers</button>
+    <button id="tab-requests" onclick="showTab('requests')">Password Requests</button>
+    <button id="tab-rank" onclick="showTab('rank')">🏆 RANK</button>
+    <button id="tab-reports" onclick="showTab('reports')">📊 Reports</button>
+    <button id="tab-account" onclick="showTab('account')">⚙️ My Account</button>
+    <button id="tab-ai" onclick="showTab('ai')">AI Assistant</button>
+  </div>
+
+  <div id="view-overview" class="view"><div class="tab-banner banner-overview"><span>System Overview</span></div>
+
+    <div class="card">
+      <h3>Featured Campus Images</h3>
+      <div class="image-gallery">
+        <div class="image-tile tile-bahirdar"><span>Bahir Dar University</span></div>
+        <div class="image-tile tile-library"><span>Jan Moscu Library</span></div>
+        <div class="image-tile tile-campus"><span>Campus</span></div>
+      </div>
+    </div>
+    <div class="card">
+      <h3>System Summary</h3>
+      <div class="stat">Students: <b id="countStudents">0</b></div>
+      <div class="stat">Teachers: <b id="countTeachers">0</b></div>
+      <div class="stat">Pending Requests: <b id="countRequests">0</b></div>
+    </div>
+  </div>
+
+  <div id="view-students" class="view" style="display:none"><div class="tab-banner banner-students"><span>Students</span></div>
+    <div class="card">
+      <h3>Students</h3>
+      <input type="text" id="studentSearch" placeholder="Search by name or ID..." oninput="renderStudents()" style="max-width: 300px; margin-bottom: 12px;">
+      <table>
+        <thead>
+          <tr>
+            <th>Full Name</th><th>Login ID</th><th>Grade</th><th>Section</th><th>Field</th><th>Status</th><th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="studentsTable"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card"><h3>Featured — Students Area</h3><div class="image-gallery"><div class="image-tile tile-students"><span>Students</span></div><div class="image-tile tile-classroom"><span>Classrooms</span></div><div class="image-tile tile-teacher"><span>Teachers</span></div></div></div>
+
+    <div class="card" id="studentDetailCard" style="display:none;border-left:4px solid #1a73e8;background:#f9fbfd;">
+      <h3>Student Detail</h3>
+      <div id="sdHeader"></div>
+      <div id="sdAcademic"></div>
+      <div id="sdSecurity" style="margin-top:16px;padding:14px;background:white;border-radius:8px;border:1px solid #e0e0e0;">
+        <h4 style="margin-top:0;">🔐 Security & Access</h4>
+        <div id="sdPassword"></div>
+        <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap;">
+          <button onclick="adminResetPasswordForDetail()" style="background:#e67e22;color:white;border:none;padding:10px 20px;border-radius:6px;cursor:pointer;font-weight:bold;">🔑 Reset Password</button>
+          <button onclick="adminToggleBanDetail()" id="sdBanBtn" style="background:#c0392b;color:white;border:none;padding:10px 20px;border-radius:6px;cursor:pointer;font-weight:bold;">🚫 Ban</button>
+        </div>
+      </div>
+      <div id="sdResultsSection" style="margin-top:16px;">
+        <h4>📊 Academic Performance</h4>
+        <div id="sdResults">Loading...</div>
+      </div>
+      <div style="margin-top:16px;padding:14px;background:white;border-radius:8px;border:1px solid #e0e0e0;">
+        <h4 style="margin-top:0;">📝 Admin Notes (Private)</h4>
+        <textarea id="sdNotes" placeholder="Add private notes about this student..." style="width:100%;height:80px;padding:8px;border-radius:6px;border:1px solid #ccc;font-size:13px;"></textarea>
+        <button onclick="saveAdminNotes()" style="background:#1a73e8;color:white;border:none;padding:8px 16px;border-radius:6px;cursor:pointer;margin-top:8px;">Save Notes</button>
+        <div id="sdNotesMsg" class="msg"></div>
+      </div>
+      <div style="text-align:center;margin-top:16px;">
+        <button class="link" onclick="closeStudentDetail()">Close</button>
+      </div>
+    </div>
+
+    <div id="view-teachers" class="view" style="display:none"><div class="tab-banner banner-courses"><span>Teachers</span></div>
+    <div class="card">
+      <h3>Add Teacher</h3>
+      <input type="text" id="tFullName" placeholder="Full Name" />
+      <input type="text" id="tLoginId" placeholder="Login ID (e.g. TCH-001)" />
+      <input type="text" id="tPhone" placeholder="Phone (optional)" />
+      <input type="text" id="tSubject" placeholder="Subject (e.g. Mathematics)" />
+      <input type="password" id="tPassword" placeholder="Initial Password" />
+      <button class="primary" onclick="addTeacher()">Create Teacher</button>
+      <div id="tMsg" class="msg"></div>
+    </div>
+
+    <div class="card">
+      <h3>All Teachers</h3>
+      <input type="text" id="teacherSearch" placeholder="Search by name or ID..." oninput="renderTeachers()" style="max-width: 300px; margin-bottom: 12px;">
+      <table>
+        <thead>
+          <tr>
+            <th>Full Name</th><th>Login ID</th><th>Phone</th><th>Status</th><th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="teachersTable"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card"><h3>Featured — Teaching</h3><div class="image-gallery"><div class="image-tile tile-teacher"><span>Teachers</span></div><div class="image-tile tile-reading"><span>Reading</span></div><div class="image-tile tile-science"><span>Science</span></div></div></div>
+
+    <div class="card" id="teacherDetailCard" style="display:none;border-left:4px solid #6c5ce7;background:#f9fbfd;">
+      <h3>Teacher Detail</h3>
+      <div id="tdHeader"></div>
+      <div id="tdInfo"></div>
+      <div id="tdSecurity" style="margin-top:16px;padding:14px;background:white;border-radius:8px;border:1px solid #e0e0e0;">
+        <h4 style="margin-top:0;">🔐 Security &amp; Access</h4>
+        <div id="tdPassword"></div>
+        <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap;">
+          <button onclick="adminResetPasswordForTeacher()" style="background:#e67e22;color:white;border:none;padding:10px 20px;border-radius:6px;cursor:pointer;font-weight:bold;">🔑 Reset Password</button>
+          <button onclick="adminToggleBanTeacher()" id="tdBanBtn" style="background:#c0392b;color:white;border:none;padding:10px 20px;border-radius:6px;cursor:pointer;font-weight:bold;">🚫 Ban</button>
+        </div>
+      </div>
+      <div style="margin-top:16px;">
+        <h4>📚 Subjects Taught</h4>
+        <div id="tdSubjects">Loading...</div>
+      </div>
+      <div style="margin-top:16px;">
+        <h4>📝 Exams Created</h4>
+        <div id="tdExams">Loading...</div>
+      </div>
+      <div style="margin-top:16px;padding:14px;background:white;border-radius:8px;border:1px solid #e0e0e0;">
+        <h4 style="margin-top:0;">📋 Admin Notes (Private)</h4>
+        <textarea id="tdNotes" placeholder="Add private notes about this teacher..." style="width:100%;height:80px;padding:8px;border-radius:6px;border:1px solid #ccc;font-size:13px;"></textarea>
+        <button onclick="saveTeacherNotes()" style="background:#6c5ce7;color:white;border:none;padding:8px 16px;border-radius:6px;cursor:pointer;margin-top:8px;">Save Notes</button>
+        <div id="tdNotesMsg" class="msg"></div>
+      </div>
+      <div style="text-align:center;margin-top:16px;">
+        <button class="link" onclick="closeTeacherDetail()">Close</button>
+      </div>
+    </div>
+
+    <div id="view-requests" class="view" style="display:none"><div class="tab-banner banner-requests"><span>Password Requests</span></div>
+    <div class="card">
+      <h3>Password Reset Requests</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>User ID</th><th>Email</th><th>Requested At</th><th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="requestsTable"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div id="view-rank" class="view" style="display:none"><div class="tab-banner banner-rank"><span>Rankings</span></div><div class="card"><h3>Featured — Awards</h3><div class="image-gallery"><div class="image-tile tile-trophy"><span>Trophy</span></div><div class="image-tile tile-graduation"><span>Graduation</span></div><div class="image-tile tile-chart"><span>Analytics</span></div></div></div>
+    <div class="card" style="border-left:4px solid #00b894;">
+      <h3>🏆 Cumulative Rankings (System-wide)</h3>
+      <div style="display:flex;gap:10px;margin-bottom:12px;flex-wrap:wrap;"><input type="text" id="rankSearch" placeholder="Search by name, ID, grade, field..." oninput="renderCumulativeRankTable()" style="max-width:400px;flex:1;" /><button onclick="exportRankingsCSV()" style="background:#28a745;color:white;border:none;padding:10px 20px;border-radius:6px;cursor:pointer;font-weight:bold;">📥 Export to CSV</button></div><div id="rankFullTable">Loading...</div>
+    </div>
+  </div>
+
+  <div id="view-reports" class="view" style="display:none">
+    <div class="tab-banner banner-rank"><span>Bulk Reports</span></div>
+
+    <div class="card" style="border-left:4px solid #00b894;">
+      <h3>📊 Group Report by Category</h3>
+      <p style="font-size:13px;color:#666;">Filter students by school type, grade, field, section, or exam. Then print or download the group.</p>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px;">
+        <div>
+          <label style="font-size:12px;font-weight:bold;display:block;margin-bottom:4px;">Grade Level</label>
+          <select id="brGrade"><option value="">All grades</option></select>
+        </div>
+        <div>
+          <label style="font-size:12px;font-weight:bold;display:block;margin-bottom:4px;">Field</label>
+          <select id="brField"><option value="">All fields</option></select>
+        </div>
+        <div>
+          <label style="font-size:12px;font-weight:bold;display:block;margin-bottom:4px;">Section</label>
+          <select id="brSection"><option value="">All sections</option></select>
+        </div>
+        <div>
+          <label style="font-size:12px;font-weight:bold;display:block;margin-bottom:4px;">Exam</label>
+          <select id="brExam"><option value="">All exams (cumulative)</option></select>
+        </div>
+      </div>
+
+      <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap;">
+        <button onclick="previewBulkReport()" style="background:#1a73e8;color:white;border:none;padding:10px 20px;border-radius:6px;cursor:pointer;font-weight:bold;">🔍 Preview Group</button>
+        <button onclick="printBulkReport()" style="background:#6c5ce7;color:white;border:none;padding:10px 20px;border-radius:6px;cursor:pointer;font-weight:bold;">🖨️ Print Group</button>
+        <button onclick="downloadBulkReportCSV()" style="background:#28a745;color:white;border:none;padding:10px 20px;border-radius:6px;cursor:pointer;font-weight:bold;">📥 Download CSV</button>
+        <button onclick="downloadBulkReportPDF()" style="background:#e67e22;color:white;border:none;padding:10px 20px;border-radius:6px;cursor:pointer;font-weight:bold;">📄 Download PDF</button>
+        <button onclick="printEachStudentInGroup()" style="background:#e67e22;color:white;border:none;padding:10px 20px;border-radius:6px;cursor:pointer;font-weight:bold;">📄 Print Each Student</button>
+      </div>
+
+      <div id="brMsg" class="msg"></div>
+      <div id="brPreview" style="margin-top:16px;"></div>
+    </div>
+  </div>
+
+  <div id="view-account" class="view" style="display:none">
+    <div class="tab-banner banner-overview"><span>My Account</span></div>
+
+    <div class="card" style="border-left:4px solid #e74c3c;">
+      <h3>🔐 Change My Login ID</h3>
+      <p style="font-size:13px;color:#666;">Changing your login ID requires a secret code. The code is hidden for security.</p>
+      <div id="myAccountInfo" style="margin:12px 0;padding:12px;background:#f7f9fc;border-radius:6px;"></div>
+      <button onclick="startChangeOwnLoginId()" style="background:#e74c3c;color:white;border:none;padding:10px 20px;border-radius:6px;cursor:pointer;font-weight:bold;">🔄 Change My Login ID</button>
+      <div id="acMsg" class="msg"></div>
+    </div>
+
+    <div class="card" style="border-left:4px solid #e67e22;">
+      <h3>🔑 Change My Password</h3>
+      <p style="font-size:13px;color:#666;">Changing your password requires a secret code. The code is hidden for security.</p>
+      <div id="myPasswordInfo" style="margin:12px 0;padding:12px;background:#f7f9fc;border-radius:6px;"></div>
+      <button onclick="startChangeOwnPassword()" style="background:#e67e22;color:white;border:none;padding:10px 20px;border-radius:6px;cursor:pointer;font-weight:bold;">🔑 Change My Password</button>
+      <div id="pwMsg" class="msg"></div>
+    </div>
+
+    <div class="card">
+      <h3>ℹ️ Account Info</h3>
+      <div id="accountDetailInfo">Loading...</div>
+    </div>
+  </div>
+
+  <div id="view-ai" class="view" style="display:none"><div class="tab-banner banner-ai"><span>AI Assistant</span></div>
+    <div class="card">
+      <h3>AI Assistant (Admin)</h3>
+      <p style="color:#666;font-size:13px;">Ask about any student, teacher, or the system.</p>
+      <input type="text" id="aiQuestion" placeholder="Ask a question..." />
+      <button class="primary" onclick="askAI()">Ask</button>
+      <div id="aiAnswer" style="margin-top:12px;white-space:pre-wrap;"></div>
+    </div>
+  </div>
+
+  <div style="text-align:center;margin-top:24px;font-size:12px;color:#666;">
+    Customer Service: <a href="https://t.me/TE21HUSH" target="_blank">@TE21HUSH</a>
+  </div>
+</div>
+
+<!-- DOWNLOAD OPTIONS MODAL -->
+  <div id="downloadModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.75);z-index:9999;align-items:center;justify-content:center;padding:20px;">
+    <div style="background:white;border-radius:12px;max-width:520px;width:100%;max-height:90vh;overflow:auto;padding:26px;">
+      <h3 style="margin-top:0;color:#1a3d6d;">📥 Download Exam Results</h3>
+      <p style="color:#666;font-size:13px;margin-bottom:16px;">Exam: <b id="dlExamName"></b></p>
+
+      <p style="font-weight:bold;font-size:13px;margin-bottom:8px;">Include columns:</p>
+      <label style="display:block;margin:6px 0;font-size:14px;"><input type="checkbox" id="dlName" checked style="width:auto;margin-right:8px;"> Student Name</label>
+      <label style="display:block;margin:6px 0;font-size:14px;"><input type="checkbox" id="dlId" checked style="width:auto;margin-right:8px;"> Student ID</label>
+      <label style="display:block;margin:6px 0;font-size:14px;"><input type="checkbox" id="dlGrade" checked style="width:auto;margin-right:8px;"> Grade Level</label>
+      <label style="display:block;margin:6px 0;font-size:14px;"><input type="checkbox" id="dlField" checked style="width:auto;margin-right:8px;"> Field</label>
+      <label style="display:block;margin:6px 0;font-size:14px;"><input type="checkbox" id="dlSection" style="width:auto;margin-right:8px;"> Section</label>
+      <label style="display:block;margin:6px 0;font-size:14px;"><input type="checkbox" id="dlScore" checked style="width:auto;margin-right:8px;"> Score / Total</label>
+      <label style="display:block;margin:6px 0;font-size:14px;"><input type="checkbox" id="dlPercent" checked style="width:auto;margin-right:8px;"> Percentage</label>
+      <label style="display:block;margin:6px 0;font-size:14px;"><input type="checkbox" id="dlRank" checked style="width:auto;margin-right:8px;"> Rank</label>
+      <label style="display:block;margin:6px 0;font-size:14px;"><input type="checkbox" id="dlStatus" style="width:auto;margin-right:8px;"> Confirm Status</label>
+
+      <div style="background:#f7f9fc;padding:10px;border-radius:6px;margin:16px 0;font-size:13px;">
+        <label style="display:block;margin:4px 0;"><input type="radio" name="dlFormat" value="csv" checked style="width:auto;margin-right:6px;"> Download as CSV (Excel)</label>
+        <label style="display:block;margin:4px 0;"><input type="radio" name="dlFormat" value="pdf" style="width:auto;margin-right:6px;"> Download as PDF</label>
+      </div>
+
+      <div style="display:flex;gap:10px;justify-content:flex-end;">
+        <button onclick="closeDownloadModal()" style="background:#5a6b82;color:white;border:none;padding:10px 20px;border-radius:6px;cursor:pointer;font-weight:bold;">Cancel</button>
+        <button onclick="executeDownload()" style="background:#28a745;color:white;border:none;padding:10px 20px;border-radius:6px;cursor:pointer;font-weight:bold;">📥 Download</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/supabase-client.js"></script>
+<script src="js/ai.js"></script>
+<script src="js/admin.js"></script>
+<div class="mobile-menu-overlay" id="mobileMenuOverlay" onclick="closeMobileMenu(event)">
+  <div class="mobile-menu-drawer" onclick="event.stopPropagation()">
+    <div class="mobile-menu-header">
+      <span>SMR Menu</span>
+      <button onclick="closeMobileMenu()" aria-label="Close">×</button>
+    </div>
+    <div class="mobile-menu-list" id="mobileMenuList"></div>
+  </div>
+</div>
+<script>
+function openMobileMenu() {
+  var overlay = document.getElementById('mobileMenuOverlay');
+  var list = document.getElementById('mobileMenuList');
+  var tabs = document.querySelectorAll('.tabbar button');
+  list.innerHTML = '';
+  tabs.forEach(function (t) {
+    var btn = document.createElement('button');
+    btn.innerHTML = t.innerHTML;
+    btn.onclick = function () {
+      t.click();
+      closeMobileMenu();
+    };
+    if (t.classList.contains('active')) btn.className = 'active';
+    list.appendChild(btn);
+  });
+  overlay.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeMobileMenu(e) {
+  var overlay = document.getElementById('mobileMenuOverlay');
+  overlay.classList.remove('open');
+  document.body.style.overflow = '';
+}
+</script>
+
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
