@@ -527,366 +527,13 @@ button.loading::before {
    ============================================================ */
 
 /* Base mobile improvements */
-@media (max-width: 768px) {
-
-  /* Bolder, larger base font */
-  body {
-    font-size: 16px;
-    font-weight: 500;
-    -webkit-text-size-adjust: 100%;
-  }
-
-  /* Topbar — bigger, clearer */
-  .topbar {
-    padding: 14px 16px;
-    flex-direction: column;
-    align-items: stretch;
-    gap: 12px;
-  }
-  .topbar h2 {
-    font-size: 20px;
-    font-weight: 800;
-    text-align: center;
-  }
-  .topbar > div {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-  }
-  .topbar #adminName,
-  .topbar #teacherName,
-  .topbar #studentName {
-    font-weight: 700;
-    font-size: 15px;
-  }
-  .topbar button {
-    padding: 12px 22px;
-    font-size: 15px;
-    font-weight: 700;
-    border-radius: 8px;
-  }
-
-  /* Tab bar → horizontal scroll but with BOLD text and big taps */
-  .tabbar {
-    display: flex;
-    overflow-x: auto;
-    flex-wrap: nowrap;
-    gap: 8px;
-    padding: 10px 12px;
-    background: white;
-    border-radius: 12px;
-    margin-bottom: 16px;
-    scrollbar-width: none;
-    -webkit-overflow-scrolling: touch;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-  }
-  .tabbar::-webkit-scrollbar { display: none; }
-  .tabbar button {
-    white-space: nowrap;
-    flex-shrink: 0;
-    font-size: 15px;
-    font-weight: 700;
-    padding: 12px 20px;
-    border-radius: 8px;
-    background: #eef2f8;
-    color: #1a3d6d;
-    border: 2px solid transparent;
-    min-height: 46px;
-    transition: all 0.15s;
-  }
-  .tabbar button.active {
-    background: #1a73e8;
-    color: white;
-    border-color: #1558b0;
-    box-shadow: 0 3px 10px rgba(26, 115, 232, 0.35);
-  }
-
-  /* Container */
-  .container { padding: 12px; }
-
-  /* Cards — bigger, bolder headers */
-  .card {
-    padding: 18px 16px;
-    border-radius: 12px;
-    box-shadow: 0 3px 12px rgba(0,0,0,0.08);
-    margin-bottom: 14px;
-  }
-  .card h3 {
-    font-size: 19px;
-    font-weight: 800;
-    color: #1a3d6d;
-    margin-bottom: 14px;
-    line-height: 1.3;
-  }
-  .card h4 {
-    font-size: 16px;
-    font-weight: 700;
-  }
-
-  /* Inputs — bigger, bolder */
-  input, select, textarea {
-    font-size: 16px;
-    font-weight: 600;
-    padding: 14px 16px;
-    border-radius: 10px;
-    border: 2px solid #d0d7e3;
-    min-height: 50px;
-    width: 100%;
-    box-sizing: border-box;
-  }
-  input:focus, select:focus, textarea:focus {
-    border-color: #1a73e8;
-    outline: none;
-    box-shadow: 0 0 0 3px rgba(26,115,232,0.15);
-  }
-  textarea { min-height: 90px; }
-
-  /* Buttons — bigger, bolder */
-  button {
-    font-size: 16px;
-    font-weight: 700;
-    padding: 14px 20px;
-    border-radius: 10px;
-    min-height: 50px;
-  }
-  button.primary {
-    width: 100%;
-    letter-spacing: 0.3px;
-  }
-  button.link {
-    font-size: 15px;
-    font-weight: 700;
-    padding: 12px;
-    min-height: auto;
-  }
-
-  /* Stats — bigger */
-  .stat {
-    display: block;
-    width: 100%;
-    margin: 8px 0;
-    font-size: 16px;
-    font-weight: 600;
-    padding: 14px 16px;
-  }
-  .stat b {
-    font-size: 20px;
-    font-weight: 800;
-  }
-
-  /* Tables — bold text, larger, scrollable */
-  table {
-    display: block;
-    overflow-x: auto;
-    white-space: nowrap;
-    -webkit-overflow-scrolling: touch;
-    font-size: 15px;
-    font-weight: 500;
-  }
-  th {
-    font-weight: 800;
-    font-size: 14px;
-    padding: 12px 14px;
-    background: #1a3d6d;
-    color: white;
-  }
-  td {
-    padding: 14px;
-    font-size: 15px;
-    font-weight: 500;
-  }
-
-  /* Gallery tiles — bigger */
-  .image-gallery {
-    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-    gap: 10px;
-  }
-  .image-tile {
-    height: 100px;
-    border-radius: 10px;
-  }
-  .image-tile span {
-    font-size: 12px;
-    font-weight: 700;
-    bottom: 6px;
-    left: 8px;
-    right: 8px;
-  }
-
-  /* Banners */
-  .tab-banner {
-    height: 90px;
-    font-size: 17px;
-    font-weight: 800;
-    padding: 12px 16px;
-    border-radius: 12px;
-  }
-
-  /* Messages */
-  .msg {
-    font-size: 15px;
-    font-weight: 600;
-    padding: 14px;
-    border-radius: 10px;
-  }
-
-  /* Selection dropdowns */
-  select {
-    font-weight: 600;
-    background: white;
-  }
-}
-
 /* Extra small phones */
-@media (max-width: 420px) {
-  body { font-size: 15px; }
-
-  .card { padding: 16px 14px; }
-  .card h3 { font-size: 17px; }
-  .tabbar button { font-size: 14px; padding: 10px 16px; min-height: 44px; }
-  .topbar h2 { font-size: 18px; }
-  input, select, textarea { font-size: 15px; padding: 12px 14px; min-height: 46px; }
-  button { font-size: 15px; padding: 12px 18px; min-height: 46px; }
-}
-
 /* ============================================================
    MOBILE HAMBURGER MENU
    ============================================================ */
 
 /* Desktop: hide the hamburger */
-.mobile-menu-btn { display: none; }
-.mobile-menu-overlay { display: none; }
 
-@media (max-width: 768px) {
-  /* Replace scrollable tabbar with a hamburger menu */
-  .tabbar {
-    display: none !important;
-  }
-
-  /* Show hamburger in topbar */
-  .mobile-menu-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 48px;
-    height: 48px;
-    background: rgba(255,255,255,0.15);
-    border: 2px solid rgba(255,255,255,0.4);
-    border-radius: 10px;
-    color: white;
-    font-size: 26px;
-    font-weight: bold;
-    cursor: pointer;
-    padding: 0;
-    min-height: 0;
-    position: absolute;
-    top: 14px;
-    left: 14px;
-  }
-  .mobile-menu-btn:hover { background: rgba(255,255,255,0.25); }
-
-  .topbar {
-    position: relative;
-    padding-left: 72px;
-    padding-top: 16px;
-  }
-
-  /* Full-screen mobile menu overlay */
-  .mobile-menu-overlay {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.55);
-    z-index: 9998;
-    animation: fadeIn 0.2s;
-  }
-  .mobile-menu-overlay.open {
-    display: block;
-  }
-
-  .mobile-menu-drawer {
-    position: fixed;
-    top: 0;
-    left: 0;
-    bottom: 0;
-    width: 82%;
-    max-width: 320px;
-    background: white;
-    z-index: 9999;
-    box-shadow: 4px 0 24px rgba(0,0,0,0.25);
-    transform: translateX(-100%);
-    transition: transform 0.25s ease;
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
-  }
-  .mobile-menu-overlay.open .mobile-menu-drawer {
-    transform: translateX(0);
-  }
-
-  .mobile-menu-header {
-    background: #1a3d6d;
-    color: white;
-    padding: 20px;
-    font-size: 18px;
-    font-weight: 800;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  .mobile-menu-header button {
-    background: none;
-    border: none;
-    color: white;
-    font-size: 28px;
-    line-height: 1;
-    cursor: pointer;
-    padding: 0 8px;
-    min-height: 0;
-    width: auto;
-  }
-
-  .mobile-menu-list {
-    padding: 12px;
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-  }
-
-  .mobile-menu-list button {
-    text-align: left;
-    background: #f7f9fc;
-    color: #1a3d6d;
-    font-size: 16px;
-    font-weight: 700;
-    padding: 16px 18px;
-    border-radius: 10px;
-    border: none;
-    width: 100%;
-    min-height: 56px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    cursor: pointer;
-    transition: all 0.15s;
-  }
-  .mobile-menu-list button:active {
-    background: #e0e8f5;
-  }
-  .mobile-menu-list button.active {
-    background: #1a73e8;
-    color: white;
-  }
-
-  @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-  }
-}
 
 @media (max-width: 600px) {
   .login-wrapper {
@@ -933,26 +580,32 @@ button.loading::before {
    MOBILE OPTIMIZED — Bolder text + hamburger menu
    ============================================================ */
 
+
+/* ============================================================
+   MOBILE — Clean consolidated version
+   ============================================================ */
+
+/* Desktop: hide the hamburger and the drawer */
+.mobile-menu-btn { display: none !important; }
+.mobile-menu-overlay { display: none !important; }
+
 @media (max-width: 768px) {
+
   body {
     font-size: 16px;
     font-weight: 600;
     -webkit-text-size-adjust: 100%;
   }
 
-  /* Topbar */
+  /* Topbar with room for the hamburger */
   .topbar {
-    padding: 14px 16px 14px 72px;
+    padding: 14px 16px 14px 72px !important;
     position: relative;
     flex-direction: column;
     align-items: stretch;
     gap: 10px;
   }
-  .topbar h2 {
-    font-size: 20px;
-    font-weight: 800;
-    margin: 0;
-  }
+  .topbar h2 { font-size: 20px; font-weight: 800; margin: 0; }
   .topbar > div {
     display: flex;
     justify-content: space-between;
@@ -966,10 +619,10 @@ button.loading::before {
     border-radius: 10px;
   }
 
-  /* Hide the scrollable tab bar */
+  /* Hide the tab bar */
   .tabbar { display: none !important; }
 
-  /* Hamburger button */
+  /* Show the hamburger */
   .mobile-menu-btn {
     display: inline-flex !important;
     align-items: center;
@@ -988,17 +641,21 @@ button.loading::before {
     position: absolute;
     top: 14px;
     left: 14px;
+    z-index: 10;
   }
 
-  /* Slide-in drawer */
+  /* Show the drawer when opened */
   .mobile-menu-overlay {
     display: none;
     position: fixed;
-    inset: 0;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
     background: rgba(0,0,0,0.6);
     z-index: 9998;
   }
-  .mobile-menu-overlay.open { display: block; }
+  .mobile-menu-overlay.open { display: block !important; }
 
   .mobile-menu-drawer {
     position: absolute;
@@ -1015,9 +672,7 @@ button.loading::before {
     display: flex;
     flex-direction: column;
   }
-  .mobile-menu-overlay.open .mobile-menu-drawer {
-    transform: translateX(0);
-  }
+  .mobile-menu-overlay.open .mobile-menu-drawer { transform: translateX(0); }
 
   .mobile-menu-header {
     background: #1a3d6d;
@@ -1041,12 +696,7 @@ button.loading::before {
     min-height: 0;
   }
 
-  .mobile-menu-list {
-    padding: 12px;
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-  }
+  .mobile-menu-list { padding: 12px; display: flex; flex-direction: column; gap: 6px; }
   .mobile-menu-list button {
     text-align: left;
     background: #f7f9fc;
@@ -1063,14 +713,11 @@ button.loading::before {
     gap: 12px;
     cursor: pointer;
   }
-  .mobile-menu-list button.active {
-    background: #1a73e8;
-    color: white;
-  }
+  .mobile-menu-list button.active { background: #1a73e8; color: white; }
 
-  /* Cards */
+  /* Content */
   .container { padding: 12px; }
-  .card { padding: 18px 16px; border-radius: 12px; }
+  .card { padding: 18px 16px; border-radius: 12px; margin-bottom: 14px; }
   .card h3 { font-size: 19px; font-weight: 800; color: #1a3d6d; }
   .card h4 { font-size: 16px; font-weight: 700; }
 
@@ -1114,17 +761,8 @@ button.loading::before {
   .stat b { font-size: 20px; font-weight: 800; }
 
   /* Tables */
-  table {
-    display: block;
-    overflow-x: auto;
-    white-space: nowrap;
-    font-size: 15px;
-  }
-  th {
-    font-weight: 800;
-    font-size: 14px;
-    padding: 12px 14px;
-  }
+  table { display: block; overflow-x: auto; white-space: nowrap; font-size: 15px; }
+  th { font-weight: 800; font-size: 14px; padding: 12px 14px; }
   td { padding: 14px; font-size: 15px; font-weight: 500; }
 
   /* Banners */
@@ -1139,5 +777,10 @@ button.loading::before {
   .image-tile span { font-size: 12px; font-weight: 700; }
 }
 
-.mobile-menu-btn { display: none; }
-.mobile-menu-overlay { display: none; }
+@media (max-width: 420px) {
+  body { font-size: 15px; }
+  .card { padding: 16px 14px; }
+  .card h3 { font-size: 17px; }
+  input, select, textarea { font-size: 15px; padding: 12px 14px; min-height: 46px; }
+  button { font-size: 15px; padding: 12px 18px; min-height: 46px; }
+}
